@@ -1,0 +1,7 @@
+{
+  "sideEffects": true,
+  "devDependencies": {
+    "@bloxdjs/api": "^0.0.2",
+    "@bloxdjs/build": "^0.0.10"
+  }
+}
