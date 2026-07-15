@@ -2,6 +2,11 @@
   "sideEffects": true,
   "devDependencies": {
     "@bloxdjs/api": "^0.0.2",
-    "@bloxdjs/build": "^0.0.10"
-  }
+    "@bloxdjs/build": "^0.0.10",
+    "@types/node": "^26.1.1"
+  },
+  "dependencies": {
+    "@bloxdjs/schematic": "^0.0.3"
+  },
+  "type": "module"
 }

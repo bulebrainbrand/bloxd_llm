@@ -1,6 +1,6 @@
 "use codeblock{testTokenize}";
-import { awaitRead } from "../memory/base";
-import { setTokenNumbers } from "../memory/token";
+import { awaitRead } from "../memory/base.ts";
+import { setTokenNumbers } from "../memory/token.ts";
 const [x, y, z] = thisPos;
 
 function* testTokenize() {

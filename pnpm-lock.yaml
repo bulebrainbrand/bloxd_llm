@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@bloxdjs/schematic':
+        specifier: ^0.0.3
+        version: 0.0.3
     devDependencies:
       '@bloxdjs/api':
         specifier: ^0.0.2
@@ -14,6 +18,9 @@ importers:
       '@bloxdjs/build':
         specifier: ^0.0.10
         version: 0.0.10
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.1.1
 
 packages:
 
@@ -60,6 +67,9 @@ packages:
   '@bloxdjs/build@0.0.10':
     resolution: {integrity: sha512-eM8K9ZeOmASe71Oh+6F6vQ4PkZFL2PBovvAV7vYSB1qTqZQN+hDV4boW1p5ycPDKmTcr7R/x8ryvkeyKAjIHTg==}
     hasBin: true
+
+  '@bloxdjs/schematic@0.0.3':
+    resolution: {integrity: sha512-I4wvgcUMyR/y0gZtbdilwi56xobxJdniAxKconWK+TjwEZjYYfCg5cLPx95UzikKtz1n56OBA9Ch5A4wjpcbQQ==}
 
   '@esbuild/aix-ppc64@0.28.1':
     resolution: {integrity: sha512-Svl7tq8k/08+p6CXPpRjQ1fKX+1odH/BQbb48fV6fj3CWHhsoIOoY87w1oHXm0qEpkIK3ZfVgp0hed3XBXzXMQ==}
@@ -236,6 +246,13 @@ packages:
   '@types/jsesc@2.5.1':
     resolution: {integrity: sha512-9VN+6yxLOPLOav+7PwjZbxiID2bVaeq0ED4qSQmdQTdjnXJSaCVKTR58t15oqH1H5t8Ng2ZX1SabJVoN9Q34bw==}
 
+  '@types/node@26.1.1':
+    resolution: {integrity: sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==}
+
+  avsc@5.7.9:
+    resolution: {integrity: sha512-yOA4wFeI7ET3v32Di/sUybQ+ttP20JHSW3mxLuNGeO0uD6PPcvLrIQXSvy/rhJOWU5JrYh7U4OHplWMmtAtjMg==}
+    engines: {node: '>=0.11'}
+
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
@@ -317,6 +334,9 @@ packages:
   unconfig@7.5.0:
     resolution: {integrity: sha512-oi8Qy2JV4D3UQ0PsopR28CzdQ3S/5A1zwsUwp/rosSbfhJ5z7b90bIyTwi/F7hCLD4SGcZVjDzd4XoUQcEanvA==}
 
+  undici-types@8.3.0:
+    resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
+
   valibot@1.4.2:
     resolution: {integrity: sha512-gjdCvJ6d3RyHAneqxMYMW9QMCwYMb3jpOO0IyHZV1bnRHFBHrX3VkIILt5XYR0WhwHiH7Mty8ovuPZ/O3gamrg==}
     peerDependencies:
@@ -387,6 +407,10 @@ snapshots:
       typescript: 6.0.3
       unconfig: 7.5.0
       valibot: 1.4.2(typescript@6.0.3)
+
+  '@bloxdjs/schematic@0.0.3':
+    dependencies:
+      avsc: 5.7.9
 
   '@esbuild/aix-ppc64@0.28.1':
     optional: true
@@ -486,6 +510,12 @@ snapshots:
 
   '@types/jsesc@2.5.1': {}
 
+  '@types/node@26.1.1':
+    dependencies:
+      undici-types: 8.3.0
+
+  avsc@5.7.9: {}
+
   balanced-match@4.0.4: {}
 
   brace-expansion@5.0.7:
@@ -577,6 +607,8 @@ snapshots:
       jiti: 2.7.0
       quansync: 1.0.0
       unconfig-core: 7.5.0
+
+  undici-types@8.3.0: {}
 
   valibot@1.4.2(typescript@6.0.3):
     optionalDependencies:

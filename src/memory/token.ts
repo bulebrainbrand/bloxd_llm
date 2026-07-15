@@ -1,7 +1,7 @@
 "use worldcode";
-import { awaitRead, awaitWrite, readData, transactionWrite } from "./base";
-import { Position } from "../types";
-import { xorHash } from "../utils";
+import { awaitRead, awaitWrite, readData, transactionWrite } from "./base.ts";
+import { type Position } from "../types.ts";
+import { xorHash } from "../utils.ts";
 export const calcTokenPositionByStr = (str: string): Position => {
   const hash = xorHash(str);
   return [

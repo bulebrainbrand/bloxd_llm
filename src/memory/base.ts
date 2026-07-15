@@ -1,5 +1,5 @@
 "use worldcode";
-import { Position } from "../types";
+import type { Position } from "../types.ts";
 
 export const writeData = (pos: Position, data: unknown) => {
   api.setBlockData(...pos, { persisted: { shared: { data } } });

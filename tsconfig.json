@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "ESNext",
+        "module": "esnext",
         "moduleResolution": "Bundler",
         "target": "ES2024",
         "jsx": "react-jsx",
@@ -9,7 +9,10 @@
         "strictNullChecks": true,
         "strictFunctionTypes": true,
         "strict": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "verbatimModuleSyntax": true
     },
     "exclude": [
         "node_modules",
