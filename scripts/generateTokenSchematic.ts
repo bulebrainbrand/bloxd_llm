@@ -6,8 +6,16 @@ import {
   splitSchematicByAxis,
 } from "@bloxdjs/schematic";
 import data from "../tokenizer.json" with { type: "json" };
-import { calcMergePositionByStr } from "../src/memory/token.ts";
+import {
+  calcMergePositionByStr,
+  calcTokenPositionByStr,
+} from "../src/memory/token.ts";
 import { mkdirSync, writeFileSync } from "node:fs";
+import {
+  TOKEN_CHUNK_X,
+  TOKEN_CHUNK_Y,
+  TOKEN_CHUNK_Z,
+} from "../src/constants.ts";
 const schematic: Schematic = {
   name: "merge",
   blockdatas: [],
@@ -35,9 +43,15 @@ const pushBlockData = (
     blockDatas.set(id, { [str]: num });
   }
 };
-for (const [i, text] of data.model.merges.entries()) {
-  const [x, y, z] = calcMergePositionByStr(text);
-  pushBlockData(x - 96, y - 64, z - 96, text, i);
+for (const [i, text] of Object.entries(data.model.vocab)) {
+  const [x, y, z] = calcTokenPositionByStr(i);
+  pushBlockData(
+    x - TOKEN_CHUNK_X,
+    y - TOKEN_CHUNK_Y,
+    z - TOKEN_CHUNK_Z,
+    i,
+    text,
+  );
 }
 
 for (const [key, object] of blockDatas) {
@@ -65,13 +79,13 @@ schematic.blockdatas.sort((a, b) => a.blockX - b.blockX);
 schematic.blockdatas.sort((a, b) => a.blockY - b.blockY);
 schematic.blockdatas.sort((a, b) => a.blockZ - b.blockZ);
 const splited = splitSchematicByAxis(schematic, 2, "x");
-mkdirSync("./schematic/merge", { recursive: true });
+mkdirSync("./schematic/token", { recursive: true });
 for (const [i, schem] of splited.entries()) {
   console.log(schem.chunks[0].blocks.length);
   writeFileSync(
-    `./schematic/merge/${i + 1}.json`,
+    `./schematic/token/${i + 1}.json`,
     JSON.stringify(schem, undefined, 2),
   );
   const result = writeBloxdschem(schem);
-  writeFileSync(`./schematic/merge/${i + 1}.bloxdschem`, result);
+  writeFileSync(`./schematic/token/${i + 1}.bloxdschem`, result);
 }

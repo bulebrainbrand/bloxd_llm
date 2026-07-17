@@ -7,5 +7,5 @@ export default defineConfig({
   minify: {
     enable: false,
   },
-  debug: true,
+  debug: false,
 });

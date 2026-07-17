@@ -61,7 +61,7 @@ class TokenNode {
  * @param str
  * @param writePos - number[]として書き込む
  */
-export function* setTokenNumbers(
+export function* calcTokenNumbersAndSetBlockData(
   str: string,
   writePos: Position,
 ): Generator<unknown, void, unknown> {
