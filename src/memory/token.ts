@@ -10,6 +10,7 @@ import {
   TOKEN_CHUNK_Y,
   TOKEN_CHUNK_Z,
 } from "../constants.ts";
+import { BYTE_TO_CHAR } from "./byteObject.ts";
 export const calcTokenPositionByStr = (str: string): Position => {
   const hash = xorHash(str);
   return [
@@ -65,8 +66,14 @@ export function* calcTokenNumbersAndSetBlockData(
   str: string,
   writePos: Position,
 ): Generator<unknown, void, unknown> {
-  const words = str.replaceAll(" ", "Ġ");
-  const chars = Array.from(words);
+  const matchs = str.split(
+    /'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+/gu,
+  );
+  const chars = matchs.map((str) =>
+    encode(str)
+      .map((num) => BYTE_TO_CHAR[num]!)
+      .join(""),
+  );
   if (chars.length === 0) {
     yield* awaitWrite(writePos, "[]");
     return;
@@ -112,8 +119,40 @@ export function* calcTokenNumbersAndSetBlockData(
       throw new TypeError(
         `unexpected token key: ${node.value}. this does not include vocab! maybe wrong merger or register token vocab`,
       );
-    result.push();
+    result.push(tokenNumber);
     node = node.next;
   }
   yield* awaitWrite(writePos, JSON.stringify(result));
 }
+
+const encode = (string: string) => {
+  const octets: number[] = [];
+  const length = string.length;
+  let i = 0;
+  while (i < length) {
+    var codePoint = string.codePointAt(i)!;
+    var c = 0;
+    var bits = 0;
+    if (codePoint <= 0x0000007f) {
+      c = 0;
+      bits = 0x00;
+    } else if (codePoint <= 0x000007ff) {
+      c = 6;
+      bits = 0xc0;
+    } else if (codePoint <= 0x0000ffff) {
+      c = 12;
+      bits = 0xe0;
+    } else if (codePoint <= 0x001fffff) {
+      c = 18;
+      bits = 0xf0;
+    }
+    octets.push(bits | (codePoint >> c));
+    c -= 6;
+    while (c >= 0) {
+      octets.push(0x80 | ((codePoint >> c) & 0x3f));
+      c -= 6;
+    }
+    i += codePoint >= 0x10000 ? 2 : 1;
+  }
+  return octets;
+};
