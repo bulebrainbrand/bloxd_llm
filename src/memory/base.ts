@@ -1,12 +1,12 @@
 "use worldcode";
 import type { Position } from "../types.ts";
 
-export const writeData = (pos: Position, data: unknown) => {
-  api.setBlockData(...pos, { persisted: { shared: { data } } });
+export const writeData = (pos: Position, data: string) => {
+  api.setBlockData(...pos, { persisted: { shared: { text: data } } });
 };
 
-export const readData = (pos: Position): unknown => {
-  return api.getBlockData(...pos)?.persisted?.shared?.data;
+export const readData = (pos: Position): string => {
+  return api.getBlockData(...pos)?.persisted?.shared?.text;
 };
 export function* awaitLoad(pos: Position) {
   while (!api.isBlockInLoadedChunk(...pos)) yield api.getBlock(pos);
@@ -14,7 +14,7 @@ export function* awaitLoad(pos: Position) {
 
 export function* transactionWrite(
   pos: Position,
-  factory: (arg: unknown) => unknown,
+  factory: (arg: string) => string,
 ): Generator<string, void, unknown> {
   const value = yield* awaitRead(pos);
   const result = factory(value);
@@ -27,7 +27,7 @@ export function* awaitRead(pos: Position) {
   return readData(pos);
 }
 
-export function* awaitWrite(pos: Position, data: unknown) {
+export function* awaitWrite(pos: Position, data: string) {
   yield* awaitLoad(pos);
   writeData(pos, data);
 }

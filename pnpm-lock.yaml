@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@bloxdjs/schematic':
-        specifier: ^0.0.3
-        version: 0.0.3
+        specifier: ^0.0.5
+        version: 0.0.5
     devDependencies:
       '@bloxdjs/api':
         specifier: ^0.0.2
@@ -68,8 +68,8 @@ packages:
     resolution: {integrity: sha512-eM8K9ZeOmASe71Oh+6F6vQ4PkZFL2PBovvAV7vYSB1qTqZQN+hDV4boW1p5ycPDKmTcr7R/x8ryvkeyKAjIHTg==}
     hasBin: true
 
-  '@bloxdjs/schematic@0.0.3':
-    resolution: {integrity: sha512-I4wvgcUMyR/y0gZtbdilwi56xobxJdniAxKconWK+TjwEZjYYfCg5cLPx95UzikKtz1n56OBA9Ch5A4wjpcbQQ==}
+  '@bloxdjs/schematic@0.0.5':
+    resolution: {integrity: sha512-iF3ZJpNOnvg5tz3WNWWWCcGujlRQ0fNDA2geZTF2ZebEYpsdpC08yaXQ9T/B4Cqm+DZoQr4Sq2ZpAvthqFAJsg==}
 
   '@esbuild/aix-ppc64@0.28.1':
     resolution: {integrity: sha512-Svl7tq8k/08+p6CXPpRjQ1fKX+1odH/BQbb48fV6fj3CWHhsoIOoY87w1oHXm0qEpkIK3ZfVgp0hed3XBXzXMQ==}
@@ -408,7 +408,7 @@ snapshots:
       unconfig: 7.5.0
       valibot: 1.4.2(typescript@6.0.3)
 
-  '@bloxdjs/schematic@0.0.3':
+  '@bloxdjs/schematic@0.0.5':
     dependencies:
       avsc: 5.7.9
 

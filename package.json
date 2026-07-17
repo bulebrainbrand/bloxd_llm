@@ -6,7 +6,7 @@
     "@types/node": "^26.1.1"
   },
   "dependencies": {
-    "@bloxdjs/schematic": "^0.0.3"
+    "@bloxdjs/schematic": "^0.0.5"
   },
   "type": "module"
 }

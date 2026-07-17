@@ -1,22 +1,30 @@
 "use worldcode";
-import { awaitRead, awaitWrite, readData, transactionWrite } from "./base.ts";
+import { awaitRead, awaitWrite } from "./base.ts";
 import { type Position } from "../types.ts";
 import { xorHash } from "../utils.ts";
+import {
+  MERGE_CHUNK_X,
+  MERGE_CHUNK_Y,
+  MERGE_CHUNK_Z,
+  TOKEN_CHUNK_X,
+  TOKEN_CHUNK_Y,
+  TOKEN_CHUNK_Z,
+} from "../constants.ts";
 export const calcTokenPositionByStr = (str: string): Position => {
   const hash = xorHash(str);
   return [
-    (hash & 31) + 96,
-    ((hash >>> 5) & 31) + 32,
-    ((hash >>> 10) & 31) + 96,
+    (hash & 31) + TOKEN_CHUNK_X,
+    ((hash >>> 5) & 31) + TOKEN_CHUNK_Y,
+    ((hash >>> 10) & 31) + TOKEN_CHUNK_Z,
   ];
 };
 
 export const calcMergePositionByStr = (str: string): Position => {
   const hash = xorHash(str);
   return [
-    (hash & 31) + 96,
-    ((hash >>> 5) & 31) + 64,
-    ((hash >>> 10) & 31) + 96,
+    (hash & 31) + MERGE_CHUNK_X,
+    ((hash >>> 5) & 31) + MERGE_CHUNK_Y,
+    ((hash >>> 10) & 31) + MERGE_CHUNK_Z,
   ];
 };
 /**
@@ -27,28 +35,14 @@ export const calcMergePositionByStr = (str: string): Position => {
 function* readToken(
   str: string,
 ): Generator<unknown, number | undefined, unknown> {
-  const result = yield* awaitRead(calcTokenPositionByStr(str));
+  const result = JSON.parse(yield* awaitRead(calcTokenPositionByStr(str)));
   return (result as { [str]?: number })?.[str];
 }
-function* writeToken(str: string, num: number) {
-  yield* transactionWrite(calcTokenPositionByStr(str), (arg) => {
-    arg ??= {};
-    (arg as Record<string, number>)[str] = num;
-    return arg;
-  });
-}
 
-function* writeMerge(str: string, num: number) {
-  yield* transactionWrite(calcMergePositionByStr(str), (arg) => {
-    arg ??= {};
-    (arg as Record<string, number>)[str] = num;
-    return arg;
-  });
-}
 function* readMerge(
   str: string,
 ): Generator<unknown, number | undefined, unknown> {
-  const result = yield* awaitRead(calcMergePositionByStr(str));
+  const result = JSON.parse(yield* awaitRead(calcMergePositionByStr(str)));
   return (result as { [str]?: number })?.[str];
 }
 
@@ -74,7 +68,7 @@ export function* setTokenNumbers(
   const words = str.replaceAll(" ", "Ġ");
   const chars = Array.from(words);
   if (chars.length === 0) {
-    yield* awaitWrite(writePos, []);
+    yield* awaitWrite(writePos, "[]");
     return;
   }
   const head = new TokenNode(chars[0]);
@@ -121,5 +115,5 @@ export function* setTokenNumbers(
     result.push();
     node = node.next;
   }
-  yield* awaitWrite(writePos, result);
+  yield* awaitWrite(writePos, JSON.stringify(result));
 }
