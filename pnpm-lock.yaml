@@ -16,8 +16,8 @@ importers:
         specifier: ^0.0.2
         version: 0.0.2
       '@bloxdjs/build':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       '@types/node':
         specifier: ^26.1.1
         version: 26.1.1
@@ -64,8 +64,8 @@ packages:
   '@bloxdjs/api@0.0.2':
     resolution: {integrity: sha512-eTQgZ2ZZZ3LOZxkxlQ3EyxdBZw74H14GTRmvTzIWdGOFsJVPW3xrept0M0aIQgxTOPn3PwfacWqWt27aluV+FQ==}
 
-  '@bloxdjs/build@0.0.10':
-    resolution: {integrity: sha512-eM8K9ZeOmASe71Oh+6F6vQ4PkZFL2PBovvAV7vYSB1qTqZQN+hDV4boW1p5ycPDKmTcr7R/x8ryvkeyKAjIHTg==}
+  '@bloxdjs/build@0.0.11':
+    resolution: {integrity: sha512-Q7hBP9JfXkAPXwhPpLp85I7q/jPejA2V+oD6z9MFSzyU3eL/9N6bU+2gpLjI7zlmeZbpZk+uI+tQRmFykIg4Hg==}
     hasBin: true
 
   '@bloxdjs/schematic@0.0.5':
@@ -394,7 +394,7 @@ snapshots:
 
   '@bloxdjs/api@0.0.2': {}
 
-  '@bloxdjs/build@0.0.10':
+  '@bloxdjs/build@0.0.11':
     dependencies:
       '@babel/generator': 8.0.0
       '@babel/parser': 8.0.4

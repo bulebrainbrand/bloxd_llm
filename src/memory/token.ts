@@ -36,14 +36,18 @@ export const calcMergePositionByStr = (str: string): Position => {
 function* readToken(
   str: string,
 ): Generator<unknown, number | undefined, unknown> {
-  const result = JSON.parse(yield* awaitRead(calcTokenPositionByStr(str)));
+  const text = yield* awaitRead(calcTokenPositionByStr(str));
+  if (text === undefined) return undefined;
+  const result = JSON.parse(text);
   return (result as { [str]?: number })?.[str];
 }
 
 function* readMerge(
   str: string,
 ): Generator<unknown, number | undefined, unknown> {
-  const result = JSON.parse(yield* awaitRead(calcMergePositionByStr(str)));
+  const text = yield* awaitRead(calcMergePositionByStr(str));
+  if (text === undefined) return undefined;
+  const result = JSON.parse(text);
   return (result as { [str]?: number })?.[str];
 }
 
@@ -66,63 +70,66 @@ export function* calcTokenNumbersAndSetBlockData(
   str: string,
   writePos: Position,
 ): Generator<unknown, void, unknown> {
-  const matchs = str.split(
+  const matchs = str.match(
     /'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+/gu,
   );
-  const chars = matchs.map((str) =>
+  if (matchs === null) throw new TypeError(`${str} is not parsable`);
+  const words = matchs.map((str) =>
     encode(str)
       .map((num) => BYTE_TO_CHAR[num]!)
       .join(""),
   );
-  if (chars.length === 0) {
+  if (words.length === 0) {
     yield* awaitWrite(writePos, "[]");
     return;
   }
-  const head = new TokenNode(chars[0]);
-  let current = head;
-  for (let i = 1; i < chars.length; i++) {
-    const node = new TokenNode(chars[i]);
-    current.next = node;
-    node.prev = current;
-    current = node;
-  }
-  while (true) {
-    let bestRank = Infinity;
-    let bestLeft: TokenNode | null = null;
+  const tokens: number[] = [];
+  for (const chars of words) {
+    const head = new TokenNode(chars[0]);
+    let current = head;
+    for (let i = 1; i < chars.length; i++) {
+      const node = new TokenNode(chars[i]);
+      current.next = node;
+      node.prev = current;
+      current = node;
+    }
+    while (true) {
+      let bestRank = Infinity;
+      let bestLeft: TokenNode | null = null;
 
-    let node: TokenNode | null = head;
-    while (node && node.next) {
-      const pair = node.value + " " + node.next.value;
-      const rank = yield* readMerge(pair);
+      let node: TokenNode | null = head;
+      while (node && node.next) {
+        const pair = node.value + " " + node.next.value;
+        const rank = yield* readMerge(pair);
 
-      if (rank !== undefined && rank < bestRank) {
-        bestRank = rank;
-        bestLeft = node;
+        if (rank !== undefined && rank < bestRank) {
+          bestRank = rank;
+          bestLeft = node;
+        }
+        node = node.next;
       }
+      if (bestLeft === null) {
+        break;
+      }
+      const right = bestLeft.next!;
+      bestLeft.value = bestLeft.value + right.value;
+      bestLeft.next = right.next;
+      if (right.next) {
+        right.next.prev = bestLeft;
+      }
+    }
+    let node: TokenNode | null = head;
+    while (node) {
+      const tokenNumber = yield* readToken(node.value);
+      if (tokenNumber === undefined)
+        throw new TypeError(
+          `unexpected token key: ${node.value}. this does not include vocab! maybe wrong merger or register token vocab`,
+        );
+      tokens.push(tokenNumber);
       node = node.next;
     }
-    if (bestLeft === null) {
-      break;
-    }
-    const right = bestLeft.next!;
-    bestLeft.value = bestLeft.value + right.value;
-    bestLeft.next = right.next;
-    if (right.next) {
-      right.next.prev = bestLeft;
-    }
   }
-  const result: number[] = [];
-  let node: TokenNode | null = head;
-  while (node) {
-    const tokenNumber = yield* readToken(node.value);
-    if (tokenNumber === undefined)
-      throw new TypeError(
-        `unexpected token key: ${node.value}. this does not include vocab! maybe wrong merger or register token vocab`,
-      );
-    result.push(tokenNumber);
-    node = node.next;
-  }
-  yield* awaitWrite(writePos, JSON.stringify(result));
+  yield* awaitWrite(writePos, JSON.stringify(tokens));
 }
 
 const encode = (string: string) => {

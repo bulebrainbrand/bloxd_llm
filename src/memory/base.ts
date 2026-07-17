@@ -5,7 +5,7 @@ export const writeData = (pos: Position, data: string) => {
   api.setBlockData(...pos, { persisted: { shared: { text: data } } });
 };
 
-export const readData = (pos: Position): string => {
+export const readData = (pos: Position): string | undefined => {
   return api.getBlockData(...pos)?.persisted?.shared?.text;
 };
 export function* awaitLoad(pos: Position) {
@@ -14,7 +14,7 @@ export function* awaitLoad(pos: Position) {
 
 export function* transactionWrite(
   pos: Position,
-  factory: (arg: string) => string,
+  factory: (arg: string | undefined) => string,
 ): Generator<string, void, unknown> {
   const value = yield* awaitRead(pos);
   const result = factory(value);

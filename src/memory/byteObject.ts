@@ -1,3 +1,4 @@
+"use worldcode";
 export const BYTE_TO_CHAR: Record<number, string> = {
   "0": "Ā",
   "1": "ā",

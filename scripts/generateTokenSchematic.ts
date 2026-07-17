@@ -4,6 +4,7 @@ import {
   writeBloxdschem,
   type Schematic,
   splitSchematicByAxis,
+  calcBlocksIndex,
 } from "@bloxdjs/schematic";
 import data from "../tokenizer.json" with { type: "json" };
 import {
@@ -19,7 +20,7 @@ import {
 const schematic: Schematic = {
   name: "merge",
   blockdatas: [],
-  chunks: [{ pos: [0, 0, 0], blocks: Array(32 * 32 * 32).fill(1510) }],
+  chunks: [{ pos: [0, 0, 0], blocks: Array(32 * 32 * 32).fill(0) }],
   size: [32, 32, 32],
   pos: [0, 0, 0],
 };
@@ -34,6 +35,7 @@ const pushBlockData = (
   str: string,
   num: number,
 ) => {
+  schematic.chunks[0].blocks[calcBlocksIndex(x, y, z)] = 1510;
   const id = `${x}|${y}|${z}` as const;
   if (blockDatas.has(id)) {
     const object = blockDatas.get(id)!;
@@ -78,10 +80,9 @@ for (const [key, object] of blockDatas) {
 schematic.blockdatas.sort((a, b) => a.blockX - b.blockX);
 schematic.blockdatas.sort((a, b) => a.blockY - b.blockY);
 schematic.blockdatas.sort((a, b) => a.blockZ - b.blockZ);
-const splited = splitSchematicByAxis(schematic, 2, "x");
+const splited = splitSchematicByAxis(schematic, 4, "x");
 mkdirSync("./schematic/token", { recursive: true });
 for (const [i, schem] of splited.entries()) {
-  console.log(schem.chunks[0].blocks.length);
   writeFileSync(
     `./schematic/token/${i + 1}.json`,
     JSON.stringify(schem, undefined, 2),
