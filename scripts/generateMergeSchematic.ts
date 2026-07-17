@@ -75,7 +75,7 @@ for (const [key, object] of blockDatas) {
 schematic.blockdatas.sort((a, b) => a.blockX - b.blockX);
 schematic.blockdatas.sort((a, b) => a.blockY - b.blockY);
 schematic.blockdatas.sort((a, b) => a.blockZ - b.blockZ);
-const splited = splitSchematicByAxis(schematic, 2, "x");
+const splited = splitSchematicByAxis(schematic, 4, "x");
 mkdirSync("./schematic/merge", { recursive: true });
 for (const [i, schem] of splited.entries()) {
   console.log(schem.chunks[0].blocks.length);
