@@ -8,6 +8,11 @@ import {
 import data from "../tokenizer.json" with { type: "json" };
 import { calcMergePositionByStr } from "../src/memory/token.ts";
 import { mkdirSync, writeFileSync } from "node:fs";
+import {
+  MERGE_CHUNK_X,
+  MERGE_CHUNK_Y,
+  MERGE_CHUNK_Z,
+} from "../src/constants.ts";
 const schematic: Schematic = {
   name: "merge",
   blockdatas: [],
@@ -37,7 +42,13 @@ const pushBlockData = (
 };
 for (const [i, text] of data.model.merges.entries()) {
   const [x, y, z] = calcMergePositionByStr(text);
-  pushBlockData(x - 96, y - 64, z - 96, text, i);
+  pushBlockData(
+    x - MERGE_CHUNK_X,
+    y - MERGE_CHUNK_Y,
+    z - MERGE_CHUNK_Z,
+    text,
+    i,
+  );
 }
 
 for (const [key, object] of blockDatas) {

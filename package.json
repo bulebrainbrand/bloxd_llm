@@ -8,5 +8,8 @@
   "dependencies": {
     "@bloxdjs/schematic": "^0.0.5"
   },
+  "scripts": {
+    "schem": "node scripts/schem.ts"
+  },
   "type": "module"
 }
