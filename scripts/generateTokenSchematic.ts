@@ -26,37 +26,46 @@ const schematic: Schematic = {
 };
 const blockDatas: Map<
   `${number}|${number}|${number}`,
-  Record<string, number>
+  (null | Record<string, number>)[]
 > = new Map();
 const pushBlockData = (
   x: number,
   y: number,
   z: number,
+  slot: number,
   str: string,
   num: number,
 ) => {
-  schematic.chunks[0].blocks[calcBlocksIndex(x, y, z)] = 1510;
+  schematic.chunks[0].blocks[calcBlocksIndex(x, y, z)] = 204;
   const id = `${x}|${y}|${z}` as const;
-  if (blockDatas.has(id)) {
-    const object = blockDatas.get(id)!;
-    object[str] = num;
-    blockDatas.set(id, object);
-  } else {
-    blockDatas.set(id, { [str]: num });
+  if (!blockDatas.has(id)) {
+    const arr = new Array<null | Record<string, number>>(36).fill(null);
+    arr[slot] = { [str]: num };
+    blockDatas.set(id, arr);
+    return;
   }
+  const array = blockDatas.get(id)!;
+  if (array[slot]) {
+    array[slot][str] = num;
+    blockDatas.set(id, array);
+    return;
+  }
+  array[slot] = { [str]: num };
+  blockDatas.set(id, array);
 };
 for (const [i, text] of Object.entries(data.model.vocab)) {
-  const [x, y, z] = calcTokenPositionByStr(i);
+  const [x, y, z, slot] = calcTokenPositionByStr(i);
   pushBlockData(
     x - TOKEN_CHUNK_X,
     y - TOKEN_CHUNK_Y,
     z - TOKEN_CHUNK_Z,
+    slot,
     i,
     text,
   );
 }
 
-for (const [key, object] of blockDatas) {
+for (const [key, arr] of blockDatas) {
   const [x, y, z] = key.split("|").map(Number) as [number, number, number];
   schematic.blockdatas.push({
     blockX: x,
@@ -64,14 +73,19 @@ for (const [key, object] of blockDatas) {
     blockZ: z,
     blockdataStr: JSON.stringify({
       persisted: {
-        shared: {
-          text: JSON.stringify(object),
-          uncensoredText: JSON.stringify(object),
-          textSize: 0,
-        },
-        author: "ZlzvebAKbQPWuyiA8_08q",
-        builder: "ZlzvebAKbQPWuyiA8_08q",
-        builderCanEditCode: true,
+        chestStr: JSON.stringify(
+          arr.map((obj) =>
+            obj
+              ? {
+                  name: "Dirt",
+                  amount: 1,
+                  attributes: {
+                    customAttributes: obj,
+                  },
+                }
+              : null,
+          ),
+        ),
       },
     }),
   });
@@ -83,6 +97,7 @@ schematic.blockdatas.sort((a, b) => a.blockZ - b.blockZ);
 const splited = splitSchematicByAxis(schematic, 4, "x");
 mkdirSync("./schematic/token", { recursive: true });
 for (const [i, schem] of splited.entries()) {
+  if (schem.blockdatas.length === 0) continue;
   writeFileSync(
     `./schematic/token/${i + 1}.json`,
     JSON.stringify(schem, undefined, 2),

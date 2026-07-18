@@ -1,5 +1,5 @@
 "use worldcode";
-import { awaitRead, awaitWrite } from "./base.ts";
+import { awaitLoad, awaitWrite } from "./base.ts";
 import { type Position } from "../types.ts";
 import { xorHash } from "../utils.ts";
 import {
@@ -11,21 +11,37 @@ import {
   TOKEN_CHUNK_Z,
 } from "../constants.ts";
 import { BYTE_TO_CHAR } from "./byteObject.ts";
-export const calcTokenPositionByStr = (str: string): Position => {
+type SlotPosition = [number, number, number, number];
+function* readData(x: number, y: number, z: number, slot: number) {
+  yield* awaitLoad([x, y, z]);
+  const blockData: { persisted: { chestStr: string } } | undefined =
+    api.getBlockData(x, y, z);
+  if (blockData?.persisted.chestStr) {
+    const parsed: {
+      name: string;
+      amount: number;
+      attributes: { customAttributes: any };
+    }[] = JSON.parse(blockData.persisted.chestStr);
+    return parsed[slot].attributes.customAttributes;
+  }
+}
+export const calcTokenPositionByStr = (str: string): SlotPosition => {
   const hash = xorHash(str);
   return [
-    (hash & 31) + TOKEN_CHUNK_X,
-    ((hash >>> 5) & 31) + TOKEN_CHUNK_Y,
-    ((hash >>> 10) & 31) + TOKEN_CHUNK_Z,
+    (hash & 15) + TOKEN_CHUNK_X,
+    ((hash >>> 4) & 15) + TOKEN_CHUNK_Y,
+    ((hash >>> 8) & 15) + TOKEN_CHUNK_Z,
+    (hash >>> 12) & 31,
   ];
 };
 
-export const calcMergePositionByStr = (str: string): Position => {
+export const calcMergePositionByStr = (str: string): SlotPosition => {
   const hash = xorHash(str);
   return [
-    (hash & 31) + MERGE_CHUNK_X,
-    ((hash >>> 5) & 31) + MERGE_CHUNK_Y,
-    ((hash >>> 10) & 31) + MERGE_CHUNK_Z,
+    (hash & 15) + MERGE_CHUNK_X,
+    ((hash >>> 4) & 15) + MERGE_CHUNK_Y,
+    ((hash >>> 8) & 15) + MERGE_CHUNK_Z,
+    (hash >>> 12) & 31,
   ];
 };
 /**
@@ -36,19 +52,15 @@ export const calcMergePositionByStr = (str: string): Position => {
 function* readToken(
   str: string,
 ): Generator<unknown, number | undefined, unknown> {
-  const text = yield* awaitRead(calcTokenPositionByStr(str));
-  if (text === undefined) return undefined;
-  const result = JSON.parse(text);
-  return (result as { [str]?: number })?.[str];
+  const result = yield* readData(...calcTokenPositionByStr(str));
+  return result?.[str];
 }
 
 function* readMerge(
   str: string,
 ): Generator<unknown, number | undefined, unknown> {
-  const text = yield* awaitRead(calcMergePositionByStr(str));
-  if (text === undefined) return undefined;
-  const result = JSON.parse(text);
-  return (result as { [str]?: number })?.[str];
+  const result = yield* readData(...calcMergePositionByStr(str));
+  return result?.[str];
 }
 
 class TokenNode {
